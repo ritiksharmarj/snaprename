@@ -17,6 +17,7 @@
     "lib": ["ES2024", "ESNext.Array", "ESNext.Collection", "ESNext.Iterator"],
     "module": "nodenext",
     "moduleResolution": "node16",
+    "outDir": "dist",
 
     /* Path Aliases */
     "baseUrl": ".",
