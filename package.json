@@ -11,11 +11,18 @@
     "cli": "(pnpm unlink -g || true) && pnpm link -g"
   },
   "dependencies": {
-    "commander": "^14.0.2"
+    "@ai-sdk/openai": "^2.0.72",
+    "ai": "^5.0.101",
+    "chalk": "^4.1.2",
+    "commander": "^14.0.2",
+    "conf": "^15.0.2",
+    "ora": "^5.4.1",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.7",
     "@types/node": "^24.10.1",
+    "@types/prompts": "^2.4.9",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }
