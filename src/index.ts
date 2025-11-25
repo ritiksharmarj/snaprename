@@ -13,6 +13,7 @@ import {
   updatePrompt,
 } from "./setup.js";
 import {
+  findImages,
   findScreenshots,
   getDesktopPath,
   getDownloadsPath,
@@ -23,6 +24,38 @@ import {
 const execAsync = promisify(exec);
 
 const program = new Command();
+
+interface SelectOptions {
+  directory: string;
+  filter: "screenshots" | "all";
+}
+
+function parseSelectOptions(value: string): SelectOptions {
+  const options: SelectOptions = {
+    directory: "",
+    filter: "screenshots",
+  };
+
+  const parts = value.split(",");
+  for (const part of parts) {
+    const [key, val] = part.split(":");
+    if (key && val) {
+      const trimmedKey = key.trim().toLowerCase();
+      const trimmedVal = val.trim();
+      if (trimmedKey === "dir" || trimmedKey === "directory") {
+        options.directory = trimmedVal;
+      } else if (trimmedKey === "filter") {
+        options.filter =
+          trimmedVal.toLowerCase() === "all" ? "all" : "screenshots";
+      }
+    } else if (key && !val) {
+      // If no key:value format, treat as directory path
+      options.directory = key.trim();
+    }
+  }
+
+  return options;
+}
 
 program
   .name("snaprename")
@@ -43,8 +76,8 @@ async function ensureSetup(): Promise<void> {
 program
   .option("-d, --desktop", "Rename screenshots from desktop")
   .option(
-    "-s, --select <directory>",
-    "Select screenshots from directory to rename",
+    "-s, --select <options>",
+    "Select images to rename. Format: dir:<path>,filter:<screenshots|all>",
   )
   .option("-v, --view", "Open output directory in file manager")
   .action(async (options) => {
@@ -73,7 +106,17 @@ program
 
         await renameMultipleScreenshots(screenshots);
       } else if (options.select) {
-        let directory = options.select;
+        const selectOpts = parseSelectOptions(options.select);
+        let directory = selectOpts.directory;
+
+        if (!directory) {
+          console.log(
+            chalk.red(
+              "\nPlease provide a directory. Example: snaprename -s dir:~/Downloads,filter:all\n",
+            ),
+          );
+          return;
+        }
 
         // Expand tilde to home directory
         if (directory.startsWith("~/")) {
@@ -82,19 +125,25 @@ program
           directory = join(homedir(), directory.slice(2));
         }
 
-        const screenshots = await findScreenshots(directory);
+        // Use findImages if filter is 'all', otherwise findScreenshots
+        const files =
+          selectOpts.filter === "all"
+            ? await findImages(directory)
+            : await findScreenshots(directory);
 
-        if (screenshots.length === 0) {
+        const fileType = selectOpts.filter === "all" ? "images" : "screenshots";
+
+        if (files.length === 0) {
           console.log(
-            chalk.yellow(`\nNo screenshots found in ${directory}.\n`),
+            chalk.yellow(`\nNo ${fileType} found in ${directory}.\n`),
           );
           return;
         }
 
-        const selected = await selectScreenshots(screenshots);
+        const selected = await selectScreenshots(files);
 
         if (selected.length === 0) {
-          console.log(chalk.yellow("\nNo screenshots selected.\n"));
+          console.log(chalk.yellow(`\nNo ${fileType} selected.\n`));
           return;
         }
 

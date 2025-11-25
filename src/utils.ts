@@ -8,6 +8,7 @@ import { analyzeScreenshot } from "./ai.js";
 import { getDeleteOriginal, getOutputDirectory } from "./config.js";
 
 const SCREENSHOT_PATTERN = /^Screenshot.*\.(png|jpg|jpeg)$/i;
+const IMAGE_PATTERN = /\.(png|jpg|jpeg)$/i;
 
 function getCurrentDateFolder(): string {
   const now = new Date();
@@ -58,6 +59,31 @@ export async function findScreenshots(directory: string): Promise<string[]> {
     screenshotsWithStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
 
     return screenshotsWithStats.map((item) => item.path);
+  } catch (error) {
+    console.error(chalk.red(`Error reading directory: ${directory}`), error);
+    return [];
+  }
+}
+
+export async function findImages(directory: string): Promise<string[]> {
+  try {
+    const files = await readdir(directory);
+    const imagesWithStats: Array<{ path: string; mtime: Date }> = [];
+
+    for (const file of files) {
+      if (IMAGE_PATTERN.test(file)) {
+        const filePath = join(directory, file);
+        const stats = await stat(filePath);
+        if (stats.isFile()) {
+          imagesWithStats.push({ path: filePath, mtime: stats.mtime });
+        }
+      }
+    }
+
+    // Sort by modification time, newest first
+    imagesWithStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+
+    return imagesWithStats.map((item) => item.path);
   } catch (error) {
     console.error(chalk.red(`Error reading directory: ${directory}`), error);
     return [];
