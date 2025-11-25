@@ -1,13 +1,31 @@
+import type { AnthropicMessagesModelId } from "@ai-sdk/anthropic/internal";
+import type { GoogleGenerativeAIModelId } from "@ai-sdk/google/internal";
+import type { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 import Conf from "conf";
 
 export const DEFAULT_PROMPT =
   "Can you create a filename for this image? Just give me the filename, no pre-amble, and no extension. Use one word.";
 
+export type ModelId =
+  | OpenAIChatModelId
+  | AnthropicMessagesModelId
+  | GoogleGenerativeAIModelId;
+
+export const MODELS: { id: ModelId; provider: string }[] = [
+  { id: "gpt-5-mini", provider: "openai" },
+  {
+    id: "claude-haiku-4-5",
+    provider: "anthropic",
+  },
+  { id: "gemini-2.5-flash", provider: "google" },
+];
+
 interface ConfigSchema {
   apiKey: string;
   prompt: string;
   deleteOriginal: boolean;
-  outputDirectory: string;
+  outputDir: string;
+  model: ModelId;
 }
 
 export const config = new Conf<ConfigSchema>({
@@ -16,7 +34,8 @@ export const config = new Conf<ConfigSchema>({
     apiKey: "",
     prompt: DEFAULT_PROMPT,
     deleteOriginal: false,
-    outputDirectory: "",
+    outputDir: "",
+    model: "gpt-5-mini",
   },
 });
 
@@ -45,11 +64,11 @@ export function setDeleteOriginal(value: boolean): void {
 }
 
 export function getOutputDirectory(): string {
-  return config.get("outputDirectory");
+  return config.get("outputDir");
 }
 
 export function setOutputDirectory(value: string): void {
-  config.set("outputDirectory", value);
+  config.set("outputDir", value);
 }
 
 export function hasApiKey(): boolean {
@@ -57,11 +76,20 @@ export function hasApiKey(): boolean {
   return key !== "" && key !== undefined;
 }
 
+export function getModel(): ModelId {
+  return config.get("model");
+}
+
+export function setModel(model: ModelId): void {
+  config.set("model", model);
+}
+
 export function getAllPreferences(): ConfigSchema {
   return {
     apiKey: getApiKey(),
     prompt: getPrompt(),
     deleteOriginal: getDeleteOriginal(),
-    outputDirectory: getOutputDirectory(),
+    outputDir: getOutputDirectory(),
+    model: getModel(),
   };
 }

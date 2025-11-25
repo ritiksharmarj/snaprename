@@ -11,6 +11,8 @@
     "cli": "(pnpm unlink -g || true) && pnpm link -g"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.47",
+    "@ai-sdk/google": "^2.0.43",
     "@ai-sdk/openai": "^2.0.72",
     "ai": "^5.0.101",
     "chalk": "^4.1.2",
