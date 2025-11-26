@@ -1,6 +1,6 @@
 # SnapRename
 
-Rename your screenshots with AI using GPT, Claude, or Gemini.
+A CLI tool to rename your screenshots with AI.
 
 ## Installation
 
@@ -13,12 +13,6 @@ pnpm add -g snaprename
 
 # yarn
 yarn global add snaprename
-```
-
-Or run without installing:
-
-```bash
-npx snaprename --desktop
 ```
 
 ## Setup
