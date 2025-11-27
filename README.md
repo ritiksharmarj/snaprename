@@ -2,27 +2,14 @@
 
 Rename your screenshots with AI.
 
-## Installation
-
-```bash
-# npm
-npm install -g snaprename
-
-# pnpm
-pnpm add -g snaprename
-
-# yarn
-yarn global add snaprename
-```
-
 ## Quick Start
 
 ```bash
+# Install
+npm install -g snaprename
+
 # Rename desktop screenshots
 snaprename -d
-
-# Rename selected screenshots
-snaprename -s ~/Downloads
 ```
 
 ## Setup
@@ -37,6 +24,9 @@ On first run, you'll be prompted to:
 ```bash
 # Rename all screenshots from desktop
 snaprename -d
+
+# Rename selected screenshots
+snaprename -s ~/Downloads
 
 # View all preferences
 snaprename preference
@@ -65,6 +55,28 @@ dir:<path>,filter:<screenshots|all>
 | --------------- | ------------------------ | ----------------- |
 | `dir:<path>`    | Directory to search      | `dir:~/Downloads` |
 | `filter:<type>` | default is `screenshots` | `filter:all`      |
+
+## Preference Options
+
+| Option         | Description                  |
+| -------------- | ---------------------------- |
+| `-m, --model`  | Update AI model and API key  |
+| `-p, --prompt` | Update prompt                |
+| `-d, --delete` | Toggle delete original files |
+| `-o, --output` | Update output directory      |
+
+## Examples
+
+```bash
+# Select all images from downloads dir
+snaprename -s "dir:~/Downloads,filter:all"
+
+# Delete original screenshots/images
+snaprename preference -d
+
+# Open current output dir
+snaprename -v
+```
 
 ## How It Works
 
