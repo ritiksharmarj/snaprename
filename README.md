@@ -15,6 +15,12 @@ pnpm add -g snaprename
 yarn global add snaprename
 ```
 
+Or run without installing:
+
+```bash
+npx snaprename --desktop
+```
+
 ## Setup
 
 On first run, you'll be prompted to:
