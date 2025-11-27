@@ -1,6 +1,6 @@
 # SnapRename
 
-A CLI tool to rename your screenshots with AI.
+Rename your screenshots with AI.
 
 ## Installation
 
@@ -15,10 +15,14 @@ pnpm add -g snaprename
 yarn global add snaprename
 ```
 
-Or run without installing:
+## Quick Start
 
 ```bash
-npx snaprename --desktop
+# Rename desktop screenshots
+snaprename -d
+
+# Rename selected screenshots
+snaprename -s ~/Downloads
 ```
 
 ## Setup
@@ -32,56 +36,48 @@ On first run, you'll be prompted to:
 
 ```bash
 # Rename all screenshots from desktop
-snaprename --desktop
 snaprename -d
 
-# Select screenshots from a directory
-snaprename --select dir:~/Downloads
-snaprename -s dir:~/Downloads
-
-# Select all images (not just screenshots)
-snaprename -s dir:~/Downloads,filter:all
-
-# Open output directory
-snaprename --view
-snaprename -v
-```
-
-## Preferences
-
-```bash
 # View all preferences
 snaprename preference
 
-# Update model and API key
-snaprename preference --model
-snaprename preference -m
-
-# Update prompt
-snaprename preference --prompt
-snaprename preference -p
-
-# Toggle delete original after rename
-snaprename preference --delete
-snaprename preference -d
-
-# Update output directory
-snaprename preference --output
-snaprename preference -o
+# Show help
+snaprename --help
 ```
+
+## Options
+
+| Option                | Description                     | Default  |
+| --------------------- | ------------------------------- | -------- |
+| `-d, --desktop`       | Rename screenshots from desktop | -        |
+| `-s, --select <spec>` | Select images to rename         | Required |
+| `-v, --view`          | Open output directory           | -        |
+
+## Select Format
+
+Select follow this pattern:
+
+```bash
+dir:<path>,filter:<screenshots|all>
+```
+
+| Option          | Description              | Example           |
+| --------------- | ------------------------ | ----------------- |
+| `dir:<path>`    | Directory to search      | `dir:~/Downloads` |
+| `filter:<type>` | default is `screenshots` | `filter:all`      |
 
 ## How It Works
 
 1. Finds screenshots matching `Screenshot*.png/jpg/jpeg`
-2. Sends each image to your selected AI model
+2. Sends each image to your selected AI vision model
 3. Gets a descriptive filename from AI
-4. Renames and organizes files to `~/Downloads/snaprename/YYYY-MM-DD/`
+4. Renames and organizes files to e.g. `~/Downloads/snaprename/YYYY-MM-DD/`
 
 Note - Providers do not use uploaded images to train models. They said 🤞
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 20+
 - macOS (uses `open` command for --view)
 - API key from OpenAI, Anthropic, or Google
 

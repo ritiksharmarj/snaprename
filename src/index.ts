@@ -71,7 +71,7 @@ async function ensureSetup(): Promise<void> {
 program
   .option("-d, --desktop", "Rename screenshots from desktop")
   .option(
-    "-s, --select <options>",
+    "-s, --select <spec>",
     "Select images to rename. Format: dir:<path>,filter:<screenshots|all>",
   )
   .option("-v, --view", "Open output directory in file manager")
