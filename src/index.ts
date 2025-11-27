@@ -52,10 +52,45 @@ function parseSelectOptions(value: string): SelectOptions {
   return options;
 }
 
+function showHelp(): void {
+  console.log(`${chalk.cyan("snaprename")} - Rename your screenshots with AI`);
+  console.log();
+  console.log(chalk.bold("USAGE"));
+  console.log("    snaprename [options]");
+  console.log("    snaprename preference [options]    Manage preferences");
+  console.log();
+  console.log(chalk.bold("OPTIONS"));
+  console.log("    -d, --desktop           Rename screenshots from desktop");
+  console.log(
+    "    -s, --select <spec>     Select images to rename (see format below)",
+  );
+  console.log("    -v, --view              Open output directory");
+  console.log("    -V, --version           Output version number");
+  console.log("    -h, --help              Show this help");
+  console.log();
+  console.log(chalk.bold("SELECT FORMAT"));
+  console.log("    dir:<path>,filter:<screenshots|all>");
+  console.log();
+  console.log("    dir:<path>              Directory to search");
+  console.log("    filter:<type>           screenshots (default) or all");
+  console.log();
+  console.log(chalk.bold("PREFERENCE OPTIONS"));
+  console.log("    -m, --model             Update AI model and API key");
+  console.log("    -p, --prompt            Update prompt");
+  console.log("    -d, --delete            Toggle delete originals");
+  console.log("    -o, --output            Update output directory");
+  console.log();
+  console.log(chalk.bold("EXAMPLES"));
+  console.log("    snaprename -d");
+  console.log('    snaprename -s "dir:~/Downloads,filter:all"');
+  console.log("    snaprename preference -m");
+}
+
 program
   .name("snaprename")
   .description("Rename your screenshots with AI")
-  .version(__VERSION__);
+  .version(__VERSION__)
+  .helpOption(false);
 
 // Check if user needs to run setup
 async function ensureSetup(): Promise<void> {
@@ -75,9 +110,14 @@ program
     "Select images to rename. Format: dir:<path>,filter:<screenshots|all>",
   )
   .option("-v, --view", "Open output directory in file manager")
+  .option("-h, --help", "Show this help")
   .action(async (options) => {
-    if (!options.desktop && !options.select && !options.view) {
-      program.help();
+    if (
+      options.help ||
+      (!options.desktop && !options.select && !options.view)
+    ) {
+      showHelp();
+      return;
     }
 
     if (options.view) {
