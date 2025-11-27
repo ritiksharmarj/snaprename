@@ -3,12 +3,14 @@ import { homedir } from "node:os";
 import { basename, join } from "node:path";
 import chalk from "chalk";
 import ora from "ora";
+import pLimit from "p-limit";
 import prompts from "prompts";
 import { analyzeScreenshot } from "./ai.js";
 import { getDeleteOriginal, getOutputDirectory } from "./config.js";
 
 const SCREENSHOT_PATTERN = /^Screenshot.*\.(png|jpg|jpeg)$/i;
 const IMAGE_PATTERN = /\.(png|jpg|jpeg)$/i;
+const CONCURRENCY_LIMIT = 5;
 
 function getCurrentDateFolder(): string {
   const now = new Date();
@@ -93,14 +95,24 @@ export async function findImages(directory: string): Promise<string[]> {
 export async function renameScreenshot(
   filePath: string,
   outputDir?: string,
+  spinner?: ora.Ora,
 ): Promise<boolean> {
-  const spinner = ora("Renaming...").start();
+  const localSpinner = spinner || ora("Renaming...").start();
+  const fileName = basename(filePath);
 
   try {
+    if (!spinner) {
+      localSpinner.text = `Renaming ${fileName}...`;
+    }
+
     const newName = await analyzeScreenshot(filePath);
 
     if (!newName) {
-      spinner.fail(chalk.red("Failed to generate filename"));
+      if (!spinner) {
+        localSpinner.fail(
+          chalk.red(`Failed to generate filename for ${fileName}`),
+        );
+      }
       return false;
     }
 
@@ -122,11 +134,15 @@ export async function renameScreenshot(
       await unlink(filePath);
     }
 
-    spinner.succeed(chalk.green(`Saved to: ${chalk.bold(newPath)}`));
+    if (!spinner) {
+      localSpinner.succeed(chalk.green(`Saved to: ${chalk.bold(newPath)}`));
+    }
     return true;
   } catch (error) {
-    spinner.fail(chalk.red("Error renaming file"));
-    console.error(error);
+    if (!spinner) {
+      localSpinner.fail(chalk.red(`Error renaming ${fileName}`));
+      console.error(error);
+    }
     return false;
   }
 }
@@ -167,20 +183,33 @@ export async function renameMultipleScreenshots(
   screenshots: string[],
   outputDir?: string,
 ): Promise<void> {
-  console.log(
-    chalk.blue(`\nFound ${screenshots.length} screenshot(s) to rename\n`),
-  );
+  const total = screenshots.length;
+  console.log(chalk.blue(`\nFound ${total} screenshot(s) to rename\n`));
 
+  const limit = pLimit(CONCURRENCY_LIMIT);
+  let completed = 0;
   let successCount = 0;
 
-  for (const screenshot of screenshots) {
-    const success = await renameScreenshot(screenshot, outputDir);
-    if (success) successCount++;
-  }
+  const spinner = ora(`Renaming 0/${total}...`).start();
 
-  console.log(
-    chalk.green(
-      `\nSuccessfully renamed ${successCount}/${screenshots.length} screenshot(s)\n`,
-    ),
+  const updateSpinner = () => {
+    spinner.text = `Renaming ${completed}/${total}...`;
+  };
+
+  const promises = screenshots.map((screenshot) =>
+    limit(async () => {
+      const success = await renameScreenshot(screenshot, outputDir, spinner);
+      completed++;
+      if (success) successCount++;
+      updateSpinner();
+      return success;
+    }),
   );
+
+  await Promise.all(promises);
+
+  spinner.succeed(
+    chalk.green(`Renamed ${successCount}/${total} screenshot(s)`),
+  );
+  console.log();
 }
