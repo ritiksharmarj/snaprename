@@ -1,13 +1,42 @@
 {
   "name": "snaprename",
-  "description": "Rename your screenshots with AI",
   "version": "1.0.0",
+  "description": "Rename your screenshots with AI",
   "type": "module",
   "author": "Ritik Sharma",
   "license": "MIT",
+  "scripts": {
+    "dev": "tsc -w",
+    "clean": "rm -rf dist",
+    "build": "pnpm clean && esbuild src/index.ts --bundle --platform=node --packages=external --outfile=dist/index.js --format=cjs",
+    "prepublishOnly": "pnpm build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "cli": "(pnpm unlink -g || true) && pnpm link -g"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.47",
+    "@ai-sdk/google": "^2.0.43",
+    "@ai-sdk/openai": "^2.0.72",
+    "ai": "^5.0.101",
+    "chalk": "^4.1.2",
+    "commander": "^14.0.2",
+    "conf": "^15.0.2",
+    "ora": "^5.4.1",
+    "p-limit": "^7.2.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.7",
+    "@types/node": "^24.10.1",
+    "@types/prompts": "^2.4.9",
+    "esbuild": "0.27.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ritiksharmarj/snaprename.git"
+    "url": "git+https://github.com/ritiksharmarj/snaprename.git"
   },
   "homepage": "https://github.com/ritiksharmarj/snaprename#readme",
   "bugs": {
@@ -32,33 +61,5 @@
   },
   "files": [
     "dist"
-  ],
-  "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --packages=external --outfile=dist/index.js --format=cjs",
-    "prepublishOnly": "pnpm build",
-    "dev": "tsc -w",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "cli": "(pnpm unlink -g || true) && pnpm link -g"
-  },
-  "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.47",
-    "@ai-sdk/google": "^2.0.43",
-    "@ai-sdk/openai": "^2.0.72",
-    "ai": "^5.0.101",
-    "chalk": "^4.1.2",
-    "commander": "^14.0.2",
-    "conf": "^15.0.2",
-    "ora": "^5.4.1",
-    "p-limit": "^7.2.0",
-    "prompts": "^2.4.2"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.7",
-    "@types/node": "^24.10.1",
-    "@types/prompts": "^2.4.9",
-    "esbuild": "0.27.0",
-    "prettier": "^3.6.2",
-    "typescript": "^5.9.3"
-  }
+  ]
 }

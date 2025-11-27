@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 import { exec } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import chalk from "chalk";
 import { Command } from "commander";
@@ -11,6 +13,13 @@ import * as Setup from "./setup.js";
 import * as Utils from "./utils.js";
 
 const execAsync = promisify(exec);
+
+// Read version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf-8"),
+);
 
 const program = new Command();
 
@@ -53,7 +62,7 @@ function parseSelectOptions(value: string): SelectOptions {
 program
   .name("snaprename")
   .description("Rename your screenshots with AI")
-  .version("1.0.0");
+  .version(packageJson.version);
 
 // Check if user needs to run setup
 async function ensureSetup(): Promise<void> {
