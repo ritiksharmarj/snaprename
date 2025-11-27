@@ -57,7 +57,7 @@
     "node": ">=18"
   },
   "bin": {
-    "snaprename": "./dist/index.js"
+    "snaprename": "dist/index.js"
   },
   "files": [
     "dist"
