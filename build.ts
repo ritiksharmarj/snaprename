@@ -11,14 +11,14 @@ const buildOptions: esbuild.BuildOptions = {
   platform: "node",
   packages: "external",
   outfile: "dist/index.js",
-  format: "cjs",
+  format: "esm",
   define: {
     __VERSION__: JSON.stringify(packageJson.version),
   },
 };
 
 if (isWatch) {
-  const ctx = await esbuild.context({ ...buildOptions, format: "esm" });
+  const ctx = await esbuild.context(buildOptions);
   await ctx.watch();
   console.log("Watching...");
 } else {

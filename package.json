@@ -55,7 +55,7 @@
     "macos"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "bin": {
     "snaprename": "dist/index.js"
