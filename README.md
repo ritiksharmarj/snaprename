@@ -2,6 +2,8 @@
 
 Rename your screenshots with AI.
 
+![snaprename](github.jpg)
+
 ## Quick Start
 
 ```bash
